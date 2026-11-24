@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Linxa Agent CRM 项目介绍：uhh 面向跨境电商 B2B 打磨的研发团队多 Agent 协作台，用可信数据约束受控 Agent，并以评测回归保证协作与跟进质量。" />
+  <title>项目介绍 · Linxa Agent CRM</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 216 216'%3E%3Crect width='216' height='216' rx='42' fill='%231456F0'/%3E%3Cpath d='M62 58v86h74' stroke='%23FFFFFF' stroke-width='24' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cg fill='%23FFFFFF'%3E%3Ccircle cx='152' cy='58' r='13'/%3E%3Ccircle cx='176' cy='110' r='9'/%3E%3Ccircle cx='150' cy='152' r='7'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="about.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="about.html">
+        <span class="brand-mark">
+          <svg width="16" height="16" viewBox="0 0 216 216"><path d="M62 58v86h74" stroke="#FFFFFF" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" fill="none"/><g fill="#FFFFFF"><circle cx="152" cy="58" r="13"/><circle cx="176" cy="110" r="9"/><circle cx="150" cy="152" r="7"/></g></svg>
+        </span>
+        Linxa Agent CRM
+      </a>
+      <div class="nav-actions">
+        <a class="btn primary" href="index.html#/app/inbox">进入演示</a>
+        <a class="btn" href="mobile.html#/app/inbox">手机端</a>
+        <button class="btn ghost" id="toggle-theme" type="button">切换主题</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="kicker">跨境电商 B2B · 多 Agent 协作台</div>
+      <h1>可信数据、多 Agent 协作与评测回归</h1>
+      <p class="lead">面向跨境电商与出海 B2B 的询盘与订单经营场景（uhh 个人演示）：先把买家、商机与履约事实保存下来，再让多个 Agent 在授权范围内分工协作、分析建议和起草跟进，对客动作始终保留人工确认。</p>
+      <p class="note">本页介绍完整产品的设计要点。演示站按真实结构搭建，使用虚构数据，纯静态运行，不会调用真实模型，也不会对外发送消息。</p>
+    </section>
+
+    <section>
+      <h2>要解决什么问题</h2>
+      <p>跨境 B2B 团队日常要在多端之间反复核对信息：WhatsApp 上的海外买家沟通、CRM 里的询盘与订单线索，以及企业内部的产品认证与报价政策。多个 Agent 并行分析容易口径不一，买家偏好容易被忘掉，认证依据可能过时；如果让大模型直接对客，还可能出现越权承诺和幻觉折扣。</p>
+      <p>系统的做法是：负责人选定客户范围后，由多个受控 Agent 分工读取已经确认的记忆与产品依据，协作分析询盘与商机，并产出带来源、缺失材料和下一步建议的报告。研发团队可以在工作台里补充方向并接续任务；对客动作必须经过独立确认。执行轨迹和分层评测用来定位事实遗漏、协作冲突和输出失败，为后续修正资料、工具或流程提供依据。</p>
+    </section>
+
+    <section>
+      <h2>系统设计架构全景</h2>
+      <p>将业务交互、受控 Agent Harness、三源分离的可信数据面与评测回归明确划界：记忆与知识摘要仅作参考，数据库始终保持唯一事实真源，对客与高敏操作必须过提案人审。</p>
+      <div class="diagram-box" id="about-arch-svg"></div>
+    </section>
+
+    <section>
+      <h2>持久化 Run 与动作提案状态机</h2>
+      <p>模型单回合结束只是中间态。异步队列、租约校验、6 字段带快照可逆写、人审挂起续跑与写回不确定停机共同保证长任务可控收敛。</p>
+      <div class="diagram-box" id="about-fsm-svg"></div>
+    </section>
+
+    <section>
+      <h2>核心能力</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>领域数据与权限隔离</h3>
+          <p>把 CRM 核心能力封装为统一的工具契约，入参强类型校验，并在入口绑定组织租户与角色权限。Agent 只能使用已发布白名单中的工具，跨客户查询也遵守行级隔离和操作审计。</p>
+        </article>
+        <article class="card">
+          <h3>客户画像记忆</h3>
+          <p>订单、合同和组织事实保存在数据库中作为真源；客户画像、价格敏感度、采购偏好和沟通禁忌由长期记忆系统提炼。日常对话增量写入，夜间再清洗去重；响应前召回高权重记忆，临时促销会衰减，核心身份偏好则持久锁定。</p>
+        </article>
+        <article class="card">
+          <h3>知识引用可追溯</h3>
+          <p>企业产品与报价政策通过检索层读取，并校验知识库白名单与授权范围。引用会记录内容指纹和文档版本，复用时再次核验；已下架或失效的依据会被屏蔽，避免用过时政策给出未授权折扣。</p>
+        </article>
+        <article class="card">
+          <h3>长任务受控执行</h3>
+          <p>商机深度分析往往跨多轮、耗时长。系统用显式状态机把每回合拆成意图识别、工具校验、结果观测和副作用提议，任务队列负责续跑。模型回合结束只是中间步骤，满足业务验收条件后才会进入终态。</p>
+        </article>
+        <article class="card">
+          <h3>交叉事实核验</h3>
+          <p>对购买意向、交付可行性和商务政策合规性做并行只读分析，再交叉比对证据版本与字段事实。一旦发现报价与现行策略冲突、或证据不足，就挂起自动推导，生成差异报告交由人工裁决，避免幻觉继续扩散。</p>
+        </article>
+        <article class="card">
+          <h3>评测与持续改进</h3>
+          <p>用规则校验加上语义评审，覆盖查询准确性、工具调用、审批合规、引用溯源和冲突识别。真实失败案例会沉淀为回归集。改进链路只允许调整工具说明、专家分工、上下文装配和记忆召回，权限隔离与外发审批规则保持锁定，补丁经回归和人工批准后再发布。</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>人机协同与安全边界</h2>
+      <ul class="list">
+        <li>
+          <strong>对客动作先提案、后确认</strong>
+          <span>Agent 的写入和对客沟通只会生成提案，必须在工作台经销售或主管确认后才落地，避免擅自改商机阶段或直接发信。</span>
+        </li>
+        <li>
+          <strong>白名单写入与一键撤销</strong>
+          <span>Agent 仅可自动修改 6 个低敏感辅助字段，写入前保存快照。人工撤销时会比对是否已被销售改过，避免覆盖最新的人工修改。</span>
+        </li>
+        <li>
+          <strong>策略版本与紧急熔断</strong>
+          <span>主管调整跟进策略时会生成新版本，并终止旧草稿的继续执行。必要时可按全租户或单个客户立即阻断尚未发出的对客动作。</span>
+        </li>
+        <li>
+          <strong>审批防重与并发保护</strong>
+          <span>批准、拒绝和暂停在重试时复用同一请求键，避免网络抖动导致重复执行；长耗时写入还会校验队列租约，拦截超时旧进程的迟到写回。</span>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>界面与工程</h2>
+      <ul class="list">
+        <li>
+          <strong>流式执行时间线</strong>
+          <span>工作台按事件顺序展示思考、工具调用和回执。页面刷新、断网重连或任务结束后再打开，都能完整回放执行过程。</span>
+        </li>
+        <li>
+          <strong>移动端与多端一致</strong>
+          <span>界面会适配软键盘和横幅高度，并处理中文输入法组合态，减少误触。商机看板用版本校验防止多端同时改写时的脏更新。</span>
+        </li>
+        <li>
+          <strong>统一领域服务与异步执行</strong>
+          <span>产品界面与 Agent 运行时共享同一套领域能力，数据层按组织做行级隔离。长任务先落库再入队，由独立 Worker 执行，避免页面超时悬挂。</span>
+        </li>
+      </ul>
+    </section>
+
+    <div class="cta">
+      <h2>打开演示</h2>
+      <p>演示覆盖会话收件箱、Agent 工作台、客户记忆和销售漏斗。你可以从桌面或手机进入，数据互相同步在本机浏览器中。</p>
+      <div class="cta-actions">
+        <a class="btn" href="index.html#/app/inbox">进入桌面演示</a>
+        <a class="btn ghost" href="mobile.html#/app/inbox">打开手机端</a>
+      </div>
+    </div>
+
+    <footer>Linxa Agent CRM · uhh 的个人演示站点 · 项目介绍与静态交互演示</footer>
+  </main>
+
+  <script src="welcome.js"></script>
+  <script>
+    (function () {
+      var KEY = "linxa-crm_intro_seen_v1";
+      var KEY2 = "linxa-crm_arch_intro_v2";
+      var STATE = "linxa-crm_demo_state_v1";
+      try { localStorage.setItem(KEY, "1"); localStorage.setItem(KEY2, "1"); } catch (e) {}
+
+      if (window.CrmArchDiagrams) {
+        var archBox = document.getElementById("about-arch-svg");
+        var fsmBox = document.getElementById("about-fsm-svg");
+        if (archBox) archBox.innerHTML = window.CrmArchDiagrams.renderArchSvg();
+        if (fsmBox) fsmBox.innerHTML = window.CrmArchDiagrams.renderFsmSvg();
+      }
+
+      function currentTheme() {
+        try {
+          var raw = localStorage.getItem(STATE);
+          if (raw) {
+            var theme = JSON.parse(raw).theme;
+            if (theme === "dark" || theme === "light") return theme;
+          }
+        } catch (e) {}
+        return "light";
+      }
+
+      function apply(theme) {
+        document.documentElement.setAttribute("data-theme", theme === "dark" ? "dark" : "light");
+      }
+
+      function persist(theme) {
+        try {
+          var raw = localStorage.getItem(STATE);
+          if (!raw) return;
+          var state = JSON.parse(raw);
+          if (!state || typeof state !== "object") return;
+          state.theme = theme;
+          localStorage.setItem(STATE, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      apply(currentTheme());
+      document.getElementById("toggle-theme").addEventListener("click", function () {
+        var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        apply(next);
+        persist(next);
+      });
+    })();
+  </script>
+</body>
+</html>

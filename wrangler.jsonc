@@ -1,0 +1,9 @@
+{
+  "name": "linxa-crm-demo",
+  "main": "src/worker.js",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  "workers_dev": true
+}

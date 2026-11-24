@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Linxa Agent CRM 静态交互演示站 — uhh 打造的跨境电商 B2B 多 Agent 协作台：会话收件箱、多 Agent 工作台、业务本体论语义层、客户记忆闭环与商机漏斗。" />
+  <title>Linxa Agent CRM · 静态演示工作台</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 216 216'%3E%3Crect width='216' height='216' rx='42' fill='%231456F0'/%3E%3Cpath d='M62 58v86h74' stroke='%23FFFFFF' stroke-width='24' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cg fill='%23FFFFFF'%3E%3Ccircle cx='152' cy='58' r='13'/%3E%3Ccircle cx='176' cy='110' r='9'/%3E%3Ccircle cx='150' cy='152' r='7'/%3E%3C/g%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="followups/followups.429e5d7b2d20.css" />
+</head>
+<body>
+  <div id="app"></div>
+  <script src="data.js"></script>
+  <script src="followups-state.js"></script>
+  <script src="views.js"></script>
+  <script src="app.js"></script>
+  <script src="welcome.js"></script>
+  <script>
+    /* Names and the publish ink are applied as the nodes appear, without
+       waiting for the module. A cached stylesheet cannot hide the label. */
+    (function () {
+      function textOf(el) {
+        return (el.innerText || "").replace(/\s+/g, " ").trim();
+      }
+      function paint(el) {
+        if (!el || el.nodeType !== 1 || !el.matches) return;
+        if (el.matches("[data-testid^='palette-add-']")) {
+          var label = textOf(el);
+          if (label) el.setAttribute("aria-label", label);
+        }
+        if (el.matches("button.bg-accent, button.text-accent-foreground")) {
+          var fg = getComputedStyle(document.documentElement).getPropertyValue("--color-accent-fg").trim() || "#ffffff";
+          el.style.setProperty("color", fg, "important");
+          el.style.setProperty("-webkit-text-fill-color", fg, "important");
+        }
+        var nested = el.querySelectorAll
+          ? el.querySelectorAll("[data-testid^='palette-add-'], button.bg-accent, button.text-accent-foreground")
+          : [];
+        for (var i = 0; i < nested.length; i++) paint(nested[i]);
+      }
+      new MutationObserver(function (records) {
+        for (var i = 0; i < records.length; i++) {
+          var added = records[i].addedNodes;
+          for (var j = 0; j < added.length; j++) paint(added[j]);
+        }
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    })();
+  </script>
+  <script type="module" src="followups/followups.d84bc7f1c128.js"></script>
+</body>
+</html>
